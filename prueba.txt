@@ -1,0 +1,53 @@
+id_usuario,nombre_usuario,id_libro,titulo_libro,fecha_prestamo,fecha_devolucion
+1001,Ana López,LIB001,El Principito,2025-07-01,2025-07-10
+1002,Carlos Ramírez,LIB002,Cien Años de Soledad,2025-07-03,
+1003,Lucía Méndez,LIB003,1984,2025-07-05,
+1001,Ana López,LIB004,Don Quijote de la Mancha,2025-07-06,
+1004,Mario Gómez,LIB001,El Principito,2025-07-07,
+1002,Carlos Ramírez,LIB005,Fahrenheit 451,2025-07-08,2025-07-15
+1005,Elena Ruiz,LIB006,Crónica de una Muerte Anunciada,2025-07-09,
+1003,Lucía Méndez,LIB002,Cien Años de Soledad,2025-07-09,2025-07-17
+1006,Roberto Silva,LIB007,El Amor en los Tiempos del Cólera,2025-07-10,
+1007,Carmen Torres,LIB008,La Casa de los Espíritus,2025-07-12,2025-07-20
+1008,Diego Morales,LIB009,Rayuela,2025-07-14,
+1009,Sofía Herrera,LIB010,Pedro Páramo,2025-07-15,
+1004,Mario Gómez,LIB011,El Túnel,2025-07-16,
+1010,Fernando Castro,LIB012,Ficciones,2025-07-17,2025-07-25
+1006,Roberto Silva,LIB013,La Tregua,2025-07-18,
+1011,Valeria Paz,LIB014,Conversación en la Catedral,2025-07-19,
+1007,Carmen Torres,LIB015,Los Detectives Salvajes,2025-07-20,
+1012,Andrés Vega,LIB016,El Laberinto de la Soledad,2025-07-21,2025-07-28
+1008,Diego Morales,LIB017,Como Agua para Chocolate,2025-07-22,
+1013,Patricia Ramos,LIB018,La Ciudad y los Perros,2025-07-23,
+1009,Sofía Herrera,LIB019,El Otoño del Patriarca,2025-07-24,2025-08-01
+1014,Luis Fernández,LIB020,Beloved,2025-07-25,
+1015,Isabella Cruz,LIB021,Matar a un Ruiseñor,2025-07-26,
+1010,Fernando Castro,LIB022,El Gran Gatsby,2025-07-27,
+1016,Miguel Santana,LIB023,Orgullo y Prejuicio,2025-07-28,2025-08-05
+1011,Valeria Paz,LIB024,Jane Eyre,2025-07-29,
+1017,Camila Jiménez,LIB025,Drácula,2025-07-30,
+1012,Andrés Vega,LIB026,Frankenstein,2025-07-31,
+1018,Gabriel Núñez,LIB027,El Retrato de Dorian Gray,2025-08-01,2025-08-08
+1013,Patricia Ramos,LIB028,Las Aventuras de Tom Sawyer,2025-08-02,
+1019,Daniela Rojas,LIB029,Robinson Crusoe,2025-08-03,
+1014,Luis Fernández,LIB030,Moby Dick,2025-08-04,
+1020,Ricardo Mendoza,LIB031,Guerra y Paz,2025-08-05,2025-08-12
+1015,Isabella Cruz,LIB032,Anna Karenina,2025-08-06,
+1021,Natalia Vargas,LIB033,Los Miserables,2025-08-07,
+1016,Miguel Santana,LIB034,El Conde de Montecristo,2025-08-08,
+1022,Alejandro Soto,LIB035,Crimen y Castigo,2025-08-09,2025-08-16
+1017,Camila Jiménez,LIB036,Los Hermanos Karamazov,2025-08-10,
+1023,Mariana Córdoba,LIB037,Doctor Zhivago,2025-08-11,
+1018,Gabriel Núñez,LIB038,Lolita,2025-08-12,
+1024,Esteban Guerrero,LIB039,En el Camino,2025-08-13,2025-08-20
+1019,Daniela Rojas,LIB040,El Guardián entre el Centeno,2025-08-14,
+1025,Adriana Delgado,LIB041,Ulises,2025-08-15,
+1020,Ricardo Mendoza,LIB042,Finnegans Wake,2025-08-16,
+1026,Tomás Aguilar,LIB043,En Busca del Tiempo Perdido,2025-08-17,2025-08-24
+1021,Natalia Vargas,LIB044,La Metamorfosis,2025-08-18,
+1027,Claudia Herrera,LIB045,El Proceso,2025-08-19,
+1022,Alejandro Soto,LIB046,América,2025-08-20,
+1028,Rodrigo Peña,LIB047,El Extranjero,2025-08-21,2025-08-28
+1023,Mariana Córdoba,LIB048,La Peste,2025-08-22,
+1029,Victoria Salinas,LIB049,El Mito de Sísifo,2025-08-23,
+1024,Esteban Guerrero,LIB050,Madame Bovary,2025-08-24,
