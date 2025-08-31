@@ -13,8 +13,9 @@ public class Menu {
     private final BookHashTable bookHashTable;
     private final ClientHashTable clientHashTable;
     private final ArrayList<Loan> DueLoans;
-    LocalDate hoy;
-
+    private final htmlGenerator Generator;
+    private Client mostActiveClient;
+    private Book mostLoanedBook;
 
     public Menu() {
         this.bookHashTable = new BookHashTable();
@@ -25,7 +26,8 @@ public class Menu {
         this.clientList = new ArrayList<>();
         this.loanList = new ArrayList<>();
         this.DueLoans = new ArrayList<>();
-        this.hoy = LocalDate.now();
+        //public htmlGenerator(BookHashTable libros, ClientHashTable usuarios, ArrayList<Loan> prestamos, Client masFrecuente, Book libroPrestado, ArrayList<Loan> vencidos){
+        this.Generator = new htmlGenerator();
     }
 
     public void menu() {
@@ -34,20 +36,25 @@ public class Menu {
         while (!exit) {
             System.out.println("------------------------");
             System.out.println("PROYECTO #01. \n Ingrese el valor para seleccionar una opcion.");
-            System.out.println("1.Cargar Usuarios\n2.Cargar Libros\n3.Cargar registro desde un archivo\n4.Mostrar historial de prestamos\n5.Mostrar usuarios unicos\n6.Mostrar Libros Prestados\n7.Mostrar estadisticas de prestamo\n8.Mostrar prestamos vencidos\n9.Exportar registros\n10.Salir");
+            System.out.println("1.Cargar registro desde un archivo\n2.Cargar Usuarios\n3.Cargar Libros\n4.Mostrar historial de prestamos\n5.Mostrar usuarios unicos\n6.Mostrar Libros Prestados\n7.Mostrar estadisticas de prestamo\n8.Mostrar prestamos vencidos\n9.Exportar registros\n10.Salir");
             System.out.println("------------------------");
             try {
                 menuOption = sc.nextInt();
                 switch (menuOption) {
-                    case 1 -> addClient();
-                    case 2 -> addBook();
-                    case 3 -> addFile();
+                    case 1 -> addFile();
+                    case 2 -> addClient();
+                    case 3 -> addBook();
                     case 4 -> showLoans();
                     case 5 -> clientHashTable.showTable();
                     case 6 -> bookHashTable.showTable();
                     case 7 -> showStats();
                     case 8 -> showDueLoans();
-                    case 9 -> {}
+                    case 9 ->
+                            {
+                                mostLoanedBook = findMostLoanedBook(loanList);
+                                mostActiveClient = findMostActiveClient(loanList);
+                                Generator.GenerateHTML(bookHashTable, clientHashTable, loanList, mostActiveClient, mostLoanedBook, DueLoans);
+                            }
                     case 10 -> exit = true;
                     default -> System.out.println("Seleccione una opcion entre 1-10");
                 }
@@ -60,36 +67,53 @@ public class Menu {
     }
 
     private void addClient(){
-
+        if(clientList.isEmpty()){
+            System.out.println("La lista de clientes no contiene datos!.");
+        }
+        else{
+            for (Client client : clientList) {
+                clientHashTable.insert(client);
+            }
+            System.out.println("Los clientes se han agregado correctamente!");
+        }
     }
 
     private void addBook(){
-
-
+        if(bookList.isEmpty()){
+            System.out.println("La lista de libros no contiene datos!.");
+        }
+        else {
+            for (Book book : bookList) {
+                bookHashTable.insert(book);
+            }
+            System.out.println("La lista de libros se han agregado correctamente!");
+        }
     }
+
     private void addFile() {
         System.out.println("Ingrese el nombre del archivo a leer (sin la extension .txt): ");
         try {
             sc.nextLine();
             String fileName = sc.nextLine() +".txt";
             reader.readFile(fileName, bookList, clientList, loanList);
-            loadFiles();
+            loadLoans();
         } catch (InputMismatchException e) {
             System.out.println("Entrada invalida! ");
         }
     }
 
-    private void loadFiles() {
-        for (Book book : bookList) {
-            bookHashTable.insert(book);
-        }
-        for (Client client : clientList) {
-            clientHashTable.insert(client);
-        }
+    private void loadLoans() {
         for(Loan loan : loanList) {
             // Fecha de devolución ya pasó Y no tiene fecha de devolución registrada (aún no devuelto)
-            if(loan.getDateDue() != null && loan.getDateDue().isBefore(hoy)) {
-                DueLoans.add(loan);
+            if(loan.getDateDue() == null){
+                //El plazo de préstamo sera de 15 dias
+                LocalDate newDueDate = loan.getDateLoan().plusDays(15);
+                loan.setDateDue(newDueDate);
+                //Compara la fecha del día de hoy con la fecha de vencimiento
+                if(LocalDate.now().isAfter(newDueDate)){
+                    //En este punto está vencido el préstamo
+                    DueLoans.add(loan);
+                }
             }
         }
     }
@@ -110,8 +134,70 @@ public class Menu {
         System.out.println("------------------------");
         System.out.println("ESTADISTICAS DE PRESTAMOS");
         System.out.println("------------------------");
-        System.out.printf("Total de prestamos: %d\n", loanList.size());
-        System.out.printf("Total de usuarios: %d\n", clientHashTable.toClientList().size());
+        //Total de préstamos
+        int totalPrestamos = loanList.size();
+        //Libro más prestado
+        mostLoanedBook = findMostLoanedBook(loanList);
+        //Usuario más activo
+        mostActiveClient = findMostActiveClient(loanList);
+        // Total de usuarios únicos
+        int totalUsuarios = clientHashTable.toClientList().size();
+        System.out.printf("Total de préstamos: %d\n", totalPrestamos);
+        System.out.printf("Libro más prestado: %s\n", mostLoanedBook != null ? mostLoanedBook.getTitle() : "N/A");
+        System.out.printf("Usuario más activo: %s\n", mostActiveClient != null ? mostActiveClient.getName() : "N/A");
+        System.out.printf("Total de usuarios únicos: %d\n",  totalUsuarios);
+        System.out.println("------------------------");
+    }
+
+    // Auxiliar para encontrar el libro mas prestado
+    private Book findMostLoanedBook(ArrayList<Loan> loans) {
+        if (loans.isEmpty()) return null;
+        // Obtener todos los libros únicos desde la hash table
+        ArrayList<Book> allBooks = bookHashTable.toBookList();
+
+        int maxLoanCount = 0;
+        // Para cada libro unico, contar cuantas veces aparece en los loans
+        for (Book book : allBooks) {
+            int loanCount = 0;
+            for (Loan loan : loans) {
+                if (loan.getBook() != null &&
+                        loan.getBook().getId().equals(book.getId())) {
+                    loanCount++;
+                }
+            }
+            if (loanCount > maxLoanCount) {
+                maxLoanCount = loanCount;
+                mostLoanedBook = book;
+            }
+        }
+        return mostLoanedBook;
+    }
+
+    // Auxiliar para encontrar el cliente más activo
+    private Client findMostActiveClient(ArrayList<Loan> loans) {
+        if (loans.isEmpty()) return null;
+
+        // Obtener todos los clientes unicos desde la hash table
+        ArrayList<Client> allClients = clientHashTable.toClientList();
+
+        int maxLoanCount = 0;
+
+        // Para cada cliente unico, contar cuántas veces aparece en los loans
+        for (Client client : allClients) {
+            int loanCount = 0;
+
+            for (Loan loan : loans) {
+                if (loan.getClient() != null &&
+                        loan.getClient().getId() == client.getId()) {
+                    loanCount++;
+                }
+            }
+            if (loanCount > maxLoanCount) {
+                maxLoanCount = loanCount;
+                mostActiveClient = client;
+            }
+        }
+        return mostActiveClient;
     }
 
     private void showDueLoans() {

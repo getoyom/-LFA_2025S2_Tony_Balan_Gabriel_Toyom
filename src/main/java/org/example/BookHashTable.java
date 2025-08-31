@@ -62,13 +62,13 @@ public class BookHashTable {
     }
 
     private int hashFunction(String title) {
-        int hash = 0;
+        int hashB = 0;
         int prime = 31;
         for (int i = 0; i < title.length(); i++) {
-            hash = hash * prime + title.charAt(i);
+            hashB = hashB * prime + title.charAt(i);
         }
-        hash = Math.abs(hash);
-        return (hash % SIZE) + 1;
+        hashB = Math.abs(hashB);
+        return (hashB % SIZE) + 1;
     }
 
     // Inserta libro por title (sin duplicados)

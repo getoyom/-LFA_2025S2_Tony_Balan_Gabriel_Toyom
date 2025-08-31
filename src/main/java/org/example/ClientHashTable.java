@@ -62,13 +62,13 @@ public class ClientHashTable {
     }
 
     private int hashFunction(String name) {
-        int hash = 0;
+        int hashC = 0;
         int prime = 31;
         for (int i = 0; i < name.length(); i++) {
-            hash = hash * prime + name.charAt(i);
+            hashC = hashC * prime + name.charAt(i);
         }
-        hash = Math.abs(hash);
-        return (hash % SIZE) + 1;
+        hashC = Math.abs(hashC);
+        return (hashC % SIZE) + 1;
     }
 
     // Inserta o actualiza promedio y votos
@@ -181,7 +181,7 @@ public class ClientHashTable {
                 elements++;
                 TableNode n = table[i].getNext();
                 while (n != null) {
-                    System.out.println("\t↳ " + n);
+                    System.out.printf("\t↳ %d", n);
                     elements++;
                     n = n.getNext();
                 }

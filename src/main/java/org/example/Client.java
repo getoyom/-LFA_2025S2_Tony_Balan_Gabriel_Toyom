@@ -1,6 +1,6 @@
 package org.example;
 
-public class Client {
+public class Client{
     int id_client;
     String name_client;
     Book book_loan;
@@ -10,31 +10,24 @@ public class Client {
         this.name_client = name_client;
         this.book_loan = book_loan;
     }
-
     public String getName() {
         return name_client;
     }
-
     public void setName(String name_client) {
         this.name_client = name_client;
     }
-
     public int getId() {
         return id_client;
     }
-
     public void setId_client(int id_client) {
         this.id_client = id_client;
     }
-
     public Book getBook_loan() {
         return book_loan;
     }
-
     public void setBook_loan(Book book_loan) {
         this.book_loan = book_loan;
     }
-
     @Override
     public String toString() {
         return "Cliente{" + "ID:" + id_client + ", Nombre:'" + name_client + '\'' + ", LibroPrestado:" + book_loan + '}';
