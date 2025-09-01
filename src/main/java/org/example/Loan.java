@@ -40,6 +40,7 @@ public class Loan {
 
     @Override
     public String toString() {
-        return "Prestamo{" + "Libro: " + book.getTitle() + ", Cliente: " + client.getName() + ", Fecha de prestamo: " + dateLoan + ", Fecha de devolucion: " + dateDue + '}';
+        return String.format("|Libro: %s| Cliente: %s| Fecha de prestamo: %s| Fecha de devolucion: %s|",
+                book.getTitle(), client.getName(), dateLoan, dateDue);
     }
 }

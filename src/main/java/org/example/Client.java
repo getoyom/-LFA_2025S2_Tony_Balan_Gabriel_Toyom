@@ -30,10 +30,11 @@ public class Client{
     }
     @Override
     public String toString() {
-        return "Cliente{" + "ID:" + id_client + ", Nombre:'" + name_client + '\'' + ", LibroPrestado:" + book_loan + '}';
+        return String.format("Cliente{ID:%d, Nombre:'%s', LibroPrestado:%s}",
+                id_client, name_client, book_loan);
     }
 
     public String toStringTable() {
-        return "Cliente{" + "ID=" + id_client + ", Nombre:'" + name_client + '\'' + '}';
+        return String.format("|ID: %d| Nombre: %s|", id_client, name_client);
     }
 }

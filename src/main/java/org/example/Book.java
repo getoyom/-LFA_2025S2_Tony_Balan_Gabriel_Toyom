@@ -22,7 +22,7 @@ public class Book{
     }
     @Override
     public String toString() {
-        return "Libro{" + "ID=" + id_book + ", Titulo:'" + title + '\'' + '}';
+        return String.format("|ID: %s| Titulo: %s|", id_book, title);
     }
 
 }

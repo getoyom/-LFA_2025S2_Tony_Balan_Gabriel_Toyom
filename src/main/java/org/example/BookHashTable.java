@@ -239,7 +239,7 @@ public class BookHashTable {
                 elements++;
                 TableNode n = table[i].getNext();
                 while (n != null) {
-                    System.out.printf("\t↳ %s \n", n);
+                    System.out.printf("\t↳ %s\n", n);
                     elements++;
                     n = n.getNext();
                 }

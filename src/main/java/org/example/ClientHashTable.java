@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class ClientHashTable {
 
     //Clase anidada para nodo
-    public class TableNode {
+    private class TableNode {
         private Client client;
         private boolean occupied;
         private TableNode next;
@@ -181,7 +181,7 @@ public class ClientHashTable {
                 elements++;
                 TableNode n = table[i].getNext();
                 while (n != null) {
-                    System.out.printf("\t↳ %d", n);
+                    System.out.printf("\t↳ %s\n", n);
                     elements++;
                     n = n.getNext();
                 }

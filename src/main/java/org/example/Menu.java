@@ -13,7 +13,7 @@ public class Menu {
     private final BookHashTable bookHashTable;
     private final ClientHashTable clientHashTable;
     private final ArrayList<Loan> DueLoans;
-    private final htmlGenerator Generator;
+    private final HtmlGenerator Generator;
     private Client mostActiveClient;
     private Book mostLoanedBook;
 
@@ -26,8 +26,7 @@ public class Menu {
         this.clientList = new ArrayList<>();
         this.loanList = new ArrayList<>();
         this.DueLoans = new ArrayList<>();
-        //public htmlGenerator(BookHashTable libros, ClientHashTable usuarios, ArrayList<Loan> prestamos, Client masFrecuente, Book libroPrestado, ArrayList<Loan> vencidos){
-        this.Generator = new htmlGenerator();
+        this.Generator = new HtmlGenerator();
     }
 
     public void menu() {
@@ -49,12 +48,7 @@ public class Menu {
                     case 6 -> bookHashTable.showTable();
                     case 7 -> showStats();
                     case 8 -> showDueLoans();
-                    case 9 ->
-                            {
-                                mostLoanedBook = findMostLoanedBook(loanList);
-                                mostActiveClient = findMostActiveClient(loanList);
-                                Generator.GenerateHTML(bookHashTable, clientHashTable, loanList, mostActiveClient, mostLoanedBook, DueLoans);
-                            }
+                    case 9 -> export();
                     case 10 -> exit = true;
                     default -> System.out.println("Seleccione una opcion entre 1-10");
                 }
@@ -94,8 +88,9 @@ public class Menu {
         System.out.println("Ingrese el nombre del archivo a leer (sin la extension .txt): ");
         try {
             sc.nextLine();
-            String fileName = sc.nextLine() +".txt";
-            reader.readFile(fileName, bookList, clientList, loanList);
+            String fileName = sc.nextLine();
+            String fullFileName = fileName + ".txt";
+            reader.readFile(fullFileName, bookList, clientList, loanList);
             loadLoans();
         } catch (InputMismatchException e) {
             System.out.println("Entrada invalida! ");
@@ -103,15 +98,26 @@ public class Menu {
     }
 
     private void loadLoans() {
+        //Si la fecha de devolucion es null
         for(Loan loan : loanList) {
-            // Fecha de devolución ya pasó Y no tiene fecha de devolución registrada (aún no devuelto)
             if(loan.getDateDue() == null){
-                //El plazo de préstamo sera de 15 dias
+                // El plazo de préstamo será de 15 días
                 LocalDate newDueDate = loan.getDateLoan().plusDays(15);
                 loan.setDateDue(newDueDate);
-                //Compara la fecha del día de hoy con la fecha de vencimiento
-                if(LocalDate.now().isAfter(newDueDate)){
-                    //En este punto está vencido el préstamo
+            }
+            // Verificar si el prestamo se vencio (fecha actual > fecha de vencimiento)
+            if(LocalDate.now().isAfter(loan.getDateDue())){
+                // Verificar que no esté ya en la lista de vencidos
+                boolean yaEnLista = false;
+                for(Loan dueLoan : DueLoans){
+                    if(dueLoan.getClient().getId() == loan.getClient().getId() &&
+                            dueLoan.getBook().getId().equals(loan.getBook().getId()) &&
+                            dueLoan.getDateLoan().equals(loan.getDateLoan())){
+                        yaEnLista = true;
+                        break;
+                    }
+                }
+                if(!yaEnLista){
                     DueLoans.add(loan);
                 }
             }
@@ -142,7 +148,7 @@ public class Menu {
         mostActiveClient = findMostActiveClient(loanList);
         // Total de usuarios únicos
         int totalUsuarios = clientHashTable.toClientList().size();
-        System.out.printf("Total de préstamos: %d\n", totalPrestamos);
+        System.out.printf("Total de prestamos: %d\n", totalPrestamos);
         System.out.printf("Libro más prestado: %s\n", mostLoanedBook != null ? mostLoanedBook.getTitle() : "N/A");
         System.out.printf("Usuario más activo: %s\n", mostActiveClient != null ? mostActiveClient.getName() : "N/A");
         System.out.printf("Total de usuarios únicos: %d\n",  totalUsuarios);
@@ -211,4 +217,13 @@ public class Menu {
         }
         System.out.println("------------------------");
     }
+
+    private void export(){
+        addClient();
+        addBook();
+        mostLoanedBook = findMostLoanedBook(loanList);
+        mostActiveClient = findMostActiveClient(loanList);
+        Generator.GenerateHTML(bookHashTable, clientHashTable, loanList, mostActiveClient, mostLoanedBook, DueLoans);
+    }
+
 }
