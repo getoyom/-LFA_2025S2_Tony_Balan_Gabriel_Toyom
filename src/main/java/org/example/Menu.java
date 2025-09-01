@@ -225,5 +225,4 @@ public class Menu {
         mostActiveClient = findMostActiveClient(loanList);
         Generator.GenerateHTML(bookHashTable, clientHashTable, loanList, mostActiveClient, mostLoanedBook, DueLoans);
     }
-
 }

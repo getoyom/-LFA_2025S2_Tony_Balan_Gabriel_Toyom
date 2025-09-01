@@ -9,7 +9,7 @@ public class TxtReader {
     protected String[] rows = null;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-     //Lee un archivo de texto con registros de prestamo y los procesa
+    //Lee un archivo de texto con registros de prestamo y los procesa
     public void readFile(String fileName, ArrayList<Book> bookList, ArrayList<Client> clientList, ArrayList<Loan> loanList) {
         // Limpieza de cache
         bookList.clear();
@@ -27,16 +27,17 @@ public class TxtReader {
             int successfulRecords = 0;
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
-                rows = line.split(",");
 
-                // Validar caracteres invalidos en la linea completa
-                if (hasInvalidCharacters(line, lineNumber)) {
+                // Validar Y hacer split en una sola pasada
+                rows = validateAndSplit(line, lineNumber);
+                // Si hay error de validación, continuar con la siguiente línea
+                if (rows == null) {
                     continue;
                 }
 
                 // Verificar que la linea tenga al menos 5 campos
                 if (rows.length < 5) {
-                    System.err.printf("Linea %d mal formateada (esperaba al menos 5 campos, se encontraron %d): %s%n",
+                    System.err.printf("Linea %d mal formateada (esperada al menos 5 campos, se encontraron %d): %s%n",
                             lineNumber, rows.length, line);
                     continue;
                 }
@@ -56,6 +57,40 @@ public class TxtReader {
             System.err.printf("ERROR: No se pudo leer el archivo: %s%n", fileName);
             e.printStackTrace();
         }
+    }
+
+    //Combinar validacion y split en una sola pasada
+    private String[] validateAndSplit(String line, int lineNumber) {
+        ArrayList<String> fields = new ArrayList<>();
+        StringBuilder currentField = new StringBuilder();
+
+        // Recorrer cada caracter de la linea
+        for (int i = 0; i < line.length(); i++) {
+            char character = line.charAt(i);
+
+            //Validar que sea un caracter permitido
+            if (!Character.isLetterOrDigit(character) &&
+                    character != ',' && character != ' ' &&
+                    character != '-' && character != '_') {
+                System.err.printf("Caracter invalido en linea %d, posicion %d: '%c'%n",
+                        lineNumber, (i + 1), character);
+                return null; // null indica error
+            }
+
+            //Hacer el split
+            if (character == ',') {
+                //Encontramos un delimitador, guardar el campo actual
+                fields.add(currentField.toString());
+                currentField = new StringBuilder(); // Limpiar para el siguiente campo
+            } else {
+                // Agregar el caracter al campo actual
+                currentField.append(character);
+            }
+        }
+        // agregar el campo actual a la lista de la linea que se esta seccionando
+        fields.add(currentField.toString());
+        // Convertir a String[] -> retornar como String[0] para que Java lo optimice
+        return fields.toArray(new String[0]);
     }
 
     //Procesa un registro individual del archivo
@@ -151,7 +186,6 @@ public class TxtReader {
         return true;
     }
 
-
     //Auxiliar que el nombre del usuario solo contenga letras y espacios
     private boolean isValidUserName(String userName, int lineNumber) {
         if (userName.isEmpty()) {
@@ -169,7 +203,6 @@ public class TxtReader {
         }
         return true;
     }
-
 
     //Auxiliar que verifica el ID del libro y tenga el formato correcto LIB###
     private boolean isValidBookId(String bookId, int lineNumber) {
@@ -189,7 +222,6 @@ public class TxtReader {
         String number = bookId.substring(3, 6);
         return isValidLibNumber(number, lineNumber);
     }
-
 
     //Auxiliar que verifica el codigo  y este sea exactamente 'LIB' sin números
     private boolean isValidLibCode(String code, int lineNumber) {
@@ -233,7 +265,6 @@ public class TxtReader {
         return true;
     }
 
-
     //Auxiliar para ver que el título del libro no este vacio
     private boolean isValidBookTitle(String title, int lineNumber) {
         if (title.isEmpty()) {
@@ -242,7 +273,6 @@ public class TxtReader {
         }
         return true;
     }
-
 
     //Method que parsea una fecha con manejo de errores
     private LocalDate parseDate(String dateString, int lineNumber, String fieldName) {
@@ -258,26 +288,6 @@ public class TxtReader {
             return null;
         }
     }
-
-
-    //Verifica si una linea contiene caracteres invalidos
-    private boolean hasInvalidCharacters(String line, int lineNumber) {
-        for (int i = 0; i < line.length(); i++) {
-            char character = line.charAt(i);
-            // Validar que sea un caracter permitido
-            if (!Character.isLetterOrDigit(character) &&
-                    character != ',' && character != ' ' &&
-                    character != '-' && character != '_') {
-
-                System.err.printf("Caracter invalido en linea %d, posicion %d: '%c'%n",
-                        lineNumber, (i + 1), character);
-                return true;
-            }
-        }
-        return false;
-    }
-
-
 
     //Imprime el resumen del procesamiento del archivo
     private void printSuccessfully(int totalLines, int successfulRecords, int totalLoans) {

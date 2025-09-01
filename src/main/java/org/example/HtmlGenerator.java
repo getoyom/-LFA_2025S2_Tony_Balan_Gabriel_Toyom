@@ -64,9 +64,8 @@ public class HtmlGenerator {
         escritor.write("</table>\n");
     }
 
-    /**
-     * Escribe la sección de usuarios únicos
-     */
+
+     //Escribe la seccion de usuarios unicos
     private void writeUniqueUsers(BufferedWriter escritor, ClientHashTable usuarios) throws IOException {
         escritor.write("<h2>Listado de Usuarios Unicos</h2>\n");
         escritor.write("<table>\n");
@@ -81,9 +80,7 @@ public class HtmlGenerator {
         escritor.write("</table>\n");
     }
 
-    /**
-     * Escribe la sección de libros prestados
-     */
+    //Escribe la seccion de libros prestados
     private void writeLoanedBooks(BufferedWriter escritor, BookHashTable libros) throws IOException {
         escritor.write("<h2>Listado de libros Prestados</h2>\n");
         escritor.write("<table>\n");
@@ -98,9 +95,8 @@ public class HtmlGenerator {
         escritor.write("</table>\n");
     }
 
-    /**
-     * Escribe la sección de estadísticas de préstamos
-     */
+
+     //Escribe la seccion de estadisticas de prestamos
     private void writeLoanStatistics(BufferedWriter escritor, ArrayList<Loan> prestamos, Client masFrecuente,
                                      Book libroPrestado, ClientHashTable usuarios) throws IOException {
         escritor.write("<h2>Estadisticas de Prestamos</h2>\n");
@@ -116,9 +112,7 @@ public class HtmlGenerator {
         escritor.write("</table>\n");
     }
 
-    /**
-     * Escribe la sección de préstamos vencidos
-     */
+    //Escribe la seccion de prestamos vencidos
     private void writeOverdueLoans(BufferedWriter escritor, ArrayList<Loan> vencidos) throws IOException {
         escritor.write("<h2>Prestamos Vencidos</h2>\n");
         escritor.write("<table>\n");
@@ -136,9 +130,7 @@ public class HtmlGenerator {
         escritor.write("</table>\n");
     }
 
-    /**
-     * Escribe el pie del documento HTML
-     */
+    //Escribe el pie del documento HTML
     private void writeHtmlFooter(BufferedWriter escritor) throws IOException {
         escritor.write("</body>\n</html>");
     }
