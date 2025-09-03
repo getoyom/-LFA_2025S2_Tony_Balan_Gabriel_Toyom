@@ -1,7 +1,6 @@
 package org.example;
 import java.util.ArrayList;
 
-// Hash para promediar valoraciones de artículos
 public class ClientHashTable {
 
     //Clase anidada para nodo
@@ -73,20 +72,21 @@ public class ClientHashTable {
 
     // Inserta o actualiza promedio y votos
     public void insert(Client client) {
-        if (client.getName() == null || client.getName().trim().isEmpty()) {
+        if (client == null) {
             System.out.println("Nombre no valido.");
             return;
         }
 
         // Pasar el nombre del cliente a minusculas para comparar
-        String ToLowerName = client.getName().trim().toLowerCase();
-        int index = hashFunction(ToLowerName);
+        int id = client.getId();
+        String idKey = String.valueOf(id);
+        int index = hashFunction(idKey);
 
         // Buscar si el nombre ya existe
         if (table[index].isOccupied()) {
             TableNode n = table[index];
             while (n != null) {
-                if (n.getClient().getName() != null && n.getClient().getName().trim().toLowerCase().equals(ToLowerName)) {
+                if (n.getClient() != null && n.getClient().getId() == id) {
                     //System.out.println("Cliente ya existe: " + client.getName());
                     return;
                 }
@@ -97,7 +97,7 @@ public class ClientHashTable {
             newNode.assign(client, table[index].getNext());
             table[index].setNext(newNode);
         } else {
-            // Índice vacío, agregar el cliente original (sin modificar)
+            // Vacio, agregar el cliente original (sin modificar)
             table[index].assign(client, null);
         }
     }
@@ -106,11 +106,27 @@ public class ClientHashTable {
     public Client get(String name) {
         if (name == null || name.trim().isEmpty()) return null;
         name = name.trim().toLowerCase(); // ← Normalizar aquí
-        int index = hashFunction(name);
+        for (int i = 1; i <= SIZE; i++) {
+            if (table[i].isOccupied()) {
+                TableNode n = table[i];
+                while (n != null) {
+                    if (n.getClient() != null &&
+                            n.getClient().getName().trim().toLowerCase().equals(name)) { // ← Y aquí
+                        return n.getClient();
+                    }
+                    n = n.getNext();
+                }
+            }
+        }
+        return null;
+    }
+
+    public Client getById(int id) {
+        String key = String.valueOf(id);
+        int index = hashFunction(key);
         TableNode n = table[index];
         while (n != null) {
-            if (n.getClient() != null &&
-                    n.getClient().getName().trim().toLowerCase().equals(name)) { // ← Y aquí
+            if (n.getClient() != null && n.getClient().getId() == id) {
                 return n.getClient();
             }
             n = n.getNext();
@@ -122,36 +138,71 @@ public class ClientHashTable {
         return get(name) != null;
     }
 
+    public boolean containsId(int id) {
+        return getById(id) != null;
+    }
 
     public boolean delete(String name) {
         if (name == null || name.trim().isEmpty()) return false;
         name = name.trim().toLowerCase(); // ← Normalizar aquí
-        int index = hashFunction(name);
-        TableNode n = table[index];
-        TableNode previous = null;
+        for (int i = 1; i <= SIZE; i++) {
+            if (!table[i].isOccupied()) continue;
 
-        while (n != null) {
-            if (n.getClient() != null &&
-                    n.getClient().getName().trim().toLowerCase().equals(name)) { // ← Y aquí
-                if (previous == null) {
-                    // primer nodo
-                    if (n.getNext() != null) {
-                        TableNode s = n.getNext();
-                        n.assign(s.getClient(), s.getNext());
+            TableNode n = table[i];
+            TableNode previous = null;
+
+            while (n != null) {
+                if (n.getClient() != null &&
+                        n.getClient().getName().trim().toLowerCase().equals(name)) { // ← Y aquí
+                    if (previous == null) {
+                        if (n.getNext() != null) {
+                            TableNode s = n.getNext();
+                            n.assign(s.getClient(), s.getNext());
+                        } else {
+                            n.clear();
+                        }
                     } else {
-                        n.clear();
+                        previous.setNext(n.getNext());
                     }
-                } else {
-                    previous.setNext(n.getNext());
+                    return true;
                 }
-                return true;
+                previous = n;
+                n = n.getNext();
             }
-            previous = n;
-            n = n.getNext();
         }
         return false;
     }
 
+    public boolean deleteById(int id) {
+        String key = String.valueOf(id);
+        int index = hashFunction(key);
+
+        if (!table[index].isOccupied()) return false;
+
+        // Nodo principal
+        TableNode head = table[index];
+        if (head.getClient() != null && head.getClient().getId() == id) {
+            if (head.getNext() != null) {
+                TableNode s = head.getNext();
+                head.assign(s.getClient(), s.getNext());
+            } else {
+                head.clear();
+            }
+            return true;
+        }
+        // Cadena
+        TableNode prev = head;
+        TableNode n = head.getNext();
+        while (n != null) {
+            if (n.getClient() != null && n.getClient().getId() == id) {
+                prev.setNext(n.getNext());
+                return true;
+            }
+            prev = n;
+            n = n.getNext();
+        }
+        return false;
+    }
 
     // Transformar directamente en arrayList
     public ArrayList<Client> toClientList() {

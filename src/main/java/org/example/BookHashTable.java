@@ -71,24 +71,23 @@ public class BookHashTable {
         return (hashB % SIZE) + 1;
     }
 
-    // Inserta libro por title (sin duplicados)
+    // Inserta libro
     public void insert(Book book) {
-        if (book.getTitle() == null || book.getTitle().trim().isEmpty()) {
-            System.out.println("Título no válido.");
+        // ahora se asegura unicidad por ID
+        if (book == null || book.getId() == null || book.getId().trim().isEmpty()) {
+            System.out.println("ID de libro no válido.");
             return;
         }
+        String idKey = book.getId().trim().toLowerCase();
+        int index = hashFunction(idKey);
 
-        // titulo en min para comparar
-        String lowerTitle = book.getTitle().trim().toLowerCase();
-        int index = hashFunction(lowerTitle);
-
-        // Buscar si el titulo ya existe
         if (table[index].isOccupied()) {
             TableNode n = table[index];
             while (n != null) {
-                if (n.getBook().getTitle() != null &&
-                        n.getBook().getTitle().trim().toLowerCase().equals(lowerTitle)) {
-                    // System.out.printf("Libro con título ya existe: %s \n",book.getTitle());
+                if (n.getBook() != null &&
+                        n.getBook().getId() != null &&
+                        n.getBook().getId().trim().toLowerCase().equals(idKey)) {
+                    // duplicado por ID -> no insertar
                     return;
                 }
                 n = n.getNext();
@@ -106,14 +105,18 @@ public class BookHashTable {
     public Book get(String title) {
         if (title == null || title.trim().isEmpty()) return null;
         title = title.trim().toLowerCase();
-        int index = hashFunction(title);
-        TableNode n = table[index];
-        while (n != null) {
-            if (n.getBook() != null &&
-                    n.getBook().getTitle().trim().toLowerCase().equals(title)) {
-                return n.getBook();
+        for (int i = 1; i <= SIZE; i++) {
+            if (table[i].isOccupied()) {
+                TableNode n = table[i];
+                while (n != null) {
+                    if (n.getBook() != null &&
+                            n.getBook().getTitle() != null &&
+                            n.getBook().getTitle().trim().toLowerCase().equals(title)) {
+                        return n.getBook();
+                    }
+                    n = n.getNext();
+                }
             }
-            n = n.getNext();
         }
         return null;
     }
@@ -121,23 +124,16 @@ public class BookHashTable {
     // Buscar libro por ID
     public Book getById(String id) {
         if (id == null || id.trim().isEmpty()) return null;
-        id = id.trim().toLowerCase();
-
-        for (int i = 1; i <= SIZE; i++) {
-            if (table[i].isOccupied()) {
-                // Revisar nodo principal
-                if (table[i].getBook().getId().trim().toLowerCase().equals(id)) {
-                    return table[i].getBook();
-                }
-                // Revisar nodos encadenados
-                TableNode n = table[i].getNext();
-                while (n != null) {
-                    if (n.getBook().getId().trim().toLowerCase().equals(id)) {
-                        return n.getBook();
-                    }
-                    n = n.getNext();
-                }
+        String key = id.trim().toLowerCase();
+        int index = hashFunction(key);
+        TableNode n = table[index];
+        while (n != null) {
+            if (n.getBook() != null &&
+                    n.getBook().getId() != null &&
+                    n.getBook().getId().trim().toLowerCase().equals(key)) {
+                return n.getBook();
             }
+            n = n.getNext();
         }
         return null;
     }
@@ -153,60 +149,66 @@ public class BookHashTable {
     public boolean delete(String title) {
         if (title == null || title.trim().isEmpty()) return false;
         title = title.trim().toLowerCase();
-        int index = hashFunction(title);
-        TableNode n = table[index];
-        TableNode previous = null;
+        for (int i = 1; i <= SIZE; i++) {
+            if (!table[i].isOccupied()) continue;
 
-        while (n != null) {
-            if (n.getBook() != null &&
-                    n.getBook().getTitle().trim().toLowerCase().equals(title)) {
-                if (previous == null) {
-                    // primer nodo
-                    if (n.getNext() != null) {
-                        TableNode s = n.getNext();
-                        n.assign(s.getBook(), s.getNext());
+            TableNode n = table[i];
+            TableNode previous = null;
+
+            while (n != null) {
+                if (n.getBook() != null &&
+                        n.getBook().getTitle() != null &&
+                        n.getBook().getTitle().trim().toLowerCase().equals(title)) {
+                    if (previous == null) {
+                        if (n.getNext() != null) {
+                            TableNode s = n.getNext();
+                            n.assign(s.getBook(), s.getNext());
+                        } else {
+                            n.clear();
+                        }
                     } else {
-                        n.clear();
+                        previous.setNext(n.getNext());
                     }
-                } else {
-                    previous.setNext(n.getNext());
+                    return true;
                 }
-                return true;
+                previous = n;
+                n = n.getNext();
             }
-            previous = n;
-            n = n.getNext();
         }
         return false;
     }
 
     public boolean deleteById(String id) {
         if (id == null || id.trim().isEmpty()) return false;
-        id = id.trim().toLowerCase();
+        String key = id.trim().toLowerCase();
+        int index = hashFunction(key);
 
-        for (int i = 1; i <= SIZE; i++) {
-            if (table[i].isOccupied()) {
-                // Revisar nodo principal
-                if (table[i].getBook().getId().trim().toLowerCase().equals(id)) {
-                    if (table[i].getNext() != null) {
-                        TableNode s = table[i].getNext();
-                        table[i].assign(s.getBook(), s.getNext());
-                    } else {
-                        table[i].clear();
-                    }
+        if (table[index].isOccupied()) {
+            // Revisar nodo principal
+            if (table[index].getBook() != null &&
+                    table[index].getBook().getId() != null &&
+                    table[index].getBook().getId().trim().toLowerCase().equals(key)) {
+                if (table[index].getNext() != null) {
+                    TableNode s = table[index].getNext();
+                    table[index].assign(s.getBook(), s.getNext());
+                } else {
+                    table[index].clear();
+                }
+                return true;
+            }
+
+            // Revisar nodos encadenados
+            TableNode n = table[index].getNext();
+            TableNode previous = table[index];
+            while (n != null) {
+                if (n.getBook() != null &&
+                        n.getBook().getId() != null &&
+                        n.getBook().getId().trim().toLowerCase().equals(key)) {
+                    previous.setNext(n.getNext());
                     return true;
                 }
-
-                // Revisar nodos encadenados
-                TableNode n = table[i].getNext();
-                TableNode previous = table[i];
-                while (n != null) {
-                    if (n.getBook().getId().trim().toLowerCase().equals(id)) {
-                        previous.setNext(n.getNext());
-                        return true;
-                    }
-                    previous = n;
-                    n = n.getNext();
-                }
+                previous = n;
+                n = n.getNext();
             }
         }
         return false;
