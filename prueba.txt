@@ -1,44 +1,84 @@
+id_usuario,nombre_usuario,id_libro,titulo_libro,fecha_prestamo,fecha_devolucion
 1001,Ana López,LIB001,El Principito,2025-07-01,2025-07-10
 1002,Carlos Ramírez,LIB002,Cien Años de Soledad,2025-07-03,
 1003,Lucía Méndez,LIB003,1984,2025-07-05,
-1001,Ana López,LIB004,Don Quijote de la Mancha,2025-07-06,
-1004,Mario Gómez,LIB001,El Principito,2025-07-07,
-1002,Carlos Ramírez,LIB005,Fahrenheit 451,2025-07-08,2025-07-15
-1005,Elena Ruiz,LIB006,Crónica de una Muerte Anunciada,2025-07-10,
+,José Sin ID,LIB004,Don Quijote,2025-07-06,2025-08-15
+1001,Ana López,LIB004,"Don Quijote, de la Mancha",2025-07-07,
+ABC,Mario Texto,LIB001,El Principito,2025-07-08,2025-07-18
+1005,Elena Ruiz,LIB006,"Crónica de una ""Muerte"" Anunciada",2025-07-10,
 1003,Lucía Méndez,LIB002,Cien Años de Soledad,2025-07-09,2025-07-17
-1006,Pedro Silva,LIB007,El Amor en los Tiempos del Cólera,2025-07-12,2025-08-20
+1006,Pedro Silva,,El Amor en los Tiempos del Cólera,2025-07-12,2025-08-20
 1001,Ana López,LIB008,La Casa de los Espíritus,2025-07-14,2025-08-25
-1007,Carmen Torres,LIB001,El Principito,2025-07-15,2025-08-05
-1002,Carlos Ramírez,LIB009,Rayuela,2025-07-16,
-1008,Roberto Vega,LIB010,El Túnel,2025-07-18,2025-09-15
-1003,Lucía Méndez,LIB011,La Metamorfosis,2025-07-20,
+1007,"Carmen ""La Lectora"" Torres",LIB001,El Principito,2025-07-15,2025-08-05
+1002,Carlos Ramírez,LIB009,"Rayuela, por Cortázar",2025-07-16,
+0,Usuario Cero,LIB010,El Túnel,2025-07-18,2025-09-15
+1003,,LIB011,La Metamorfosis,2025-07-20,
 1001,Ana López,LIB001,El Principito,2025-07-22,
-1009,Sofía Morales,LIB012,Ficciones,2025-07-25,2025-08-28
-1004,Mario Gómez,LIB013,El Aleph,2025-07-26,2025-08-30
-1010,Diego Herrera,LIB014,Crónicas Marcianas,2025-07-28,
-1001,Ana López,LIB015,Maus,2025-08-01,2025-09-01
+1009,"Sofía, Morales & Asociados",LIB012,Ficciones,2025-07-25,invalid_date
+-1,Mario Negativo,LIB013,El Aleph,2025-07-26,2025-08-30
+1010,Diego Herrera,LIB014,Crónicas Marcianas,invalid_date,
+1001,Ana López,LIB015,"Maus: Historia de un Sobreviviente",2025-08-01,2025-09-01
 1002,Carlos Ramírez,LIB001,El Principito,2025-08-03,
-1005,Elena Ruiz,LIB016,Persépolis,2025-08-05,2025-09-10
+1005,,LIB016,Persépolis,2025-08-05,2025-09-10
 1003,Lucía Méndez,LIB017,Watchmen,2025-08-07,
-1011,Isabel Castro,LIB018,V de Vendetta,2025-08-10,2025-09-20
-1001,Ana López,LIB019,Sandman,2025-08-12,
+1011,Isabel Castro,LIB999,"Libro ""Inexistente""",2025-08-10,2025-09-20
+1001,Ana López,NULL,Sandman,2025-08-12,
 1006,Pedro Silva,LIB001,El Principito,2025-08-14,2025-09-25
-1012,Fernando Paz,LIB020,Batman Año Uno,2025-08-16,
-1002,Carlos Ramírez,LIB021,Saga,2025-08-18,2025-09-18
-1001,Ana López,LIB022,Walking Dead,2025-08-20,
-1007,Carmen Torres,LIB023,Fables,2025-08-22,2025-09-30
-1013,Alejandra Ruiz,LIB024,Y El Último Hombre,2025-08-24,
+,,"","",,
+1002,Carlos Ramírez,LIB021,Saga Vol. 1-10,2025-08-18,2025-09-18
+1001,Ana López,LIB022,"Walking Dead, Compendio",2025-08-20,
+1007,Carmen Torres,LIB023,Fables & Folk Tales,2025-08-22,2025-09-30
+1013,Alejandra Ruiz,LIB024,Y: El Último Hombre,2025-08-24,
 1003,Lucía Méndez,LIB001,El Principito,2025-08-26,
-1014,Manuel Soto,LIB025,Preacher,2025-08-28,2025-10-05
-1001,Ana López,LIB026,Transmetropolitan,2025-08-30,
-1015,Rosa Jiménez,LIB027,100 Bullets,2025-06-15,2025-07-20
-1002,Carlos Ramírez,LIB028,Hellblazer,2025-06-18,2025-08-10
-1016,Andrés Luna,LIB029,The Sandman Universe,2025-06-20,2025-08-15
-1001,Ana López,LIB030,Lucifer,2025-05-10,2025-06-25
-1017,Patricia Ruiz,LIB031,American Gods,2025-05-15,2025-07-30
-1003,Lucía Méndez,LIB032,Good Omens,2025-05-20,2025-08-05
+9999,Usuario Alto,LIB025,Preacher: Libro de Genesis,2025-08-28,2025-10-05
+1001,Ana López,LIB026,"Trans;metropolitan",2025-08-30,
+1015,Rosa Jiménez,LIB027,100 Bullets (Serie Completa),2025-06-15,2025-07-20
+1002,Carlos Ramírez,LIB028,Hellblazer: Constantine,2025-06-18,2025-08-10
+1016,"Andrés ""Andy"" Luna",LIB029,The Sandman Universe,2025-06-20,2025-08-15
+1001,Ana López,LIB030,Lucifer: Fallen Angel,2025-05-10,2025-06-25
+1017,Patricia O'Connor,LIB031,American Gods (Edición Especial),2025-05-15,2025-07-30
+1003,Lucía Méndez,LIB032,"Good Omens: Apocalipsis, Etc.",2025-05-20,2025-08-05
 1002,Carlos Ramírez,LIB001,El Principito,2025-04-25,2025-06-10
-1018,Jorge Mendoza,LIB033,Neverwhere,2025-04-28,2025-06-15
-1001,Ana López,LIB034,The Ocean at the End of the Lane,2025-04-30,2025-06-20
-1019,Beatriz Vargas,LIB035,Coraline,2025-03-15,2025-05-10
+NULL,Jorge Mendoza,LIB033,Neverwhere: Un Viaje,2025-04-28,2025-06-15
+1001,Ana López,LIB034,The Ocean at the End,2025-04-30,2025-06-20
+1019,"Beatriz ""Bea"" Vargas",LIB035,Coraline & Other Stories,2025-03-15,2025-05-10
 1020,Alberto Rojas,LIB001,El Principito,2025-03-20,2025-05-15
+X001,Usuario X,LIB036,Libro con ID Alfanumérico,2025-08-25,
+1021,María José Fernández,LIB037,Harry Potter y la Piedra Filosofal,2025-08-26,2025-10-10
+1022,Roberto Carlos Silva,LIB001,El Principito,2025-08-27,
+1001,Ana López,LIB038,"1984, Edición Anotada",2025-08-28,
+1023,Carmen del Valle,LIB039,Fahrenheit 451: Distopía,2025-08-29,2025-10-15
+1024,Pedro José Martín,LIB040,Un Mundo Feliz,2025-08-30,
+1025,"Luis ""El Bibliotecario"" García",LIB001,El Principito,2025-08-31,
+1026,Ana María González,LIB041,Rebelión en la Granja,2025-09-01,2025-10-20
+1001,Ana López,LIB042,Ensayo sobre la Ceguera,2025-09-02,
+1027,José Antonio López,LIB043,El Nombre del Viento,2025-09-03,2025-11-05
+1002,Carlos Ramírez,LIB001,El Principito,2025-09-04,
+1028,Isabella Rodríguez,LIB044,Crónica del Pájaro,2025-09-05,2025-11-10
+1029,Fernando de la Cruz,LIB045,El Juego de Ender,2025-09-06,
+1001,Ana López,LIB001,El Principito,2025-09-07,
+1030,Valentina Moreno,LIB046,Fundación,2025-09-08,2025-11-15
+1031,Santiago Herrera,LIB047,Dune: El Mesías del Desierto,2025-09-09,
+1032,Camila Ruiz,LIB048,Neuromante,2025-09-10,2025-11-20
+1001,Ana López,LIB049,¿Sueñan los Androides?,2025-09-11,
+1033,Diego Alejandro Vega,LIB050,Blade Runner & Electric Dreams,2025-09-12,2025-11-25
+1034,Sofía Elena Castro,LIB001,El Principito,2025-09-13,
+1035,Andrés Felipe Morales,LIB051,El Marciano,2025-09-14,2025-12-01
+1001,Ana López,LIB052,Contacto: Carl Sagan,2025-09-15,
+1036,Patricia Isabel Jiménez,LIB053,2001: Odisea del Espacio,2025-09-16,2025-12-05
+1037,Miguel Ángel Torres,LIB054,La Guerra de los Mundos,2025-09-17,
+1002,Carlos Ramírez,LIB055,La Máquina del Tiempo,2025-09-18,2025-12-10
+1001,Ana López,LIB001,El Principito,2025-09-19,
+1038,Gabriela Esperanza Luna,LIB056,El Hombre Invisible,2025-09-20,
+1039,Ricardo Javier Paz,LIB057,Dr. Jekyll y Mr. Hyde,2025-09-21,2025-12-15
+1040,Daniela Carolina Soto,LIB058,Frankenstein: Mary Shelley,2025-09-22,
+1001,Ana López,LIB059,Drácula: Bram Stoker,2025-09-23,
+1041,Alejandro David Ruiz,LIB060,El Extraño Caso del Dr. Jekyll,2025-09-24,2025-12-20
+1042,Natalia Andrea Vásquez,LIB001,El Principito,2025-09-25,
+1043,Julián Sebastián Moreno,LIB061,El Retrato de Dorian Gray,2025-09-26,
+1001,Ana López,LIB062,El Fantasma de la Ópera,2025-09-27,2026-01-10
+1044,Valentina María Herrera,LIB063,Notre-Dame de París,2025-09-28,
+1045,Sebastián Andrés Castro,LIB064,Los Miserables (Abreviado),2025-09-29,2026-01-15
+1002,Carlos Ramírez,LIB001,El Principito,2025-09-30,
+1046,Carolina Isabel Morales,LIB065,El Conde de Montecristo,2025-10-01,
+1001,Ana López,LIB066,Los Tres Mosqueteros,2025-10-02,2026-01-20

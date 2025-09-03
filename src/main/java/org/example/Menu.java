@@ -187,7 +187,6 @@ public class Menu {
         ArrayList<Client> allClients = clientHashTable.toClientList();
 
         int maxLoanCount = 0;
-
         // Para cada cliente unico, contar cuántas veces aparece en los loans
         for (Client client : allClients) {
             int loanCount = 0;

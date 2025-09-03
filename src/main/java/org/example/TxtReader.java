@@ -9,7 +9,7 @@ public class TxtReader {
     protected String[] rows = null;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    //Lee un archivo de texto con registros de prestamo y los procesa
+    // Lee un archivo de texto con registros de prestamo y los procesa
     public void readFile(String fileName, ArrayList<Book> bookList, ArrayList<Client> clientList, ArrayList<Loan> loanList) {
         // Limpieza de cache
         bookList.clear();
@@ -25,19 +25,34 @@ public class TxtReader {
             String line;
             int lineNumber = 0;
             int successfulRecords = 0;
+            boolean isFirstLine = true;
+
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
 
+                // Saltar header si existe
+                if (isFirstLine && isHeaderLine(line)) {
+                    isFirstLine = false;
+                    continue;
+                }
+                isFirstLine = false;
+
+                //Saltar lineas completamente vacias
+                if (line.trim().isEmpty()) {
+                    System.out.printf("Saltando linea vacia en linea %d%n", lineNumber);
+                    continue;
+                }
+
                 // Validar Y hacer split en una sola pasada
                 rows = validateAndSplit(line, lineNumber);
-                // Si hay error de validación, continuar con la siguiente línea
+                // Si hay error de validacion, continuar con la siguiente linea
                 if (rows == null) {
                     continue;
                 }
 
                 // Verificar que la linea tenga al menos 5 campos
                 if (rows.length < 5) {
-                    System.err.printf("Linea %d mal formateada (esperada al menos 5 campos, se encontraron %d): %s%n",
+                    System.err.printf("Linea %d mal formateada (esperaba al menos 5 campos, se encontraron %d): %s%n",
                             lineNumber, rows.length, line);
                     continue;
                 }
@@ -59,38 +74,85 @@ public class TxtReader {
         }
     }
 
-    //Combinar validacion y split en una sola pasada
+    // Detecta si la primera linea es un header
+    private boolean isHeaderLine(String line) {
+        return line.toLowerCase().contains("id_usuario") ||
+                line.toLowerCase().contains("nombre_usuario") ||
+                line.toLowerCase().contains("id_libro");
+    }
+
+    // Parser que maneja caracteres especiales
     private String[] validateAndSplit(String line, int lineNumber) {
         ArrayList<String> fields = new ArrayList<>();
         StringBuilder currentField = new StringBuilder();
 
-        // Recorrer cada caracter de la linea
+        //Boolean para verificar si existen comillas
+        boolean insideQuotes = false;
+        boolean hasInvalidChars = false;
+
         for (int i = 0; i < line.length(); i++) {
             char character = line.charAt(i);
 
-            //Validar que sea un caracter permitido
-            if (!Character.isLetterOrDigit(character) &&
-                    character != ',' && character != ' ' &&
-                    character != '-' && character != '_') {
-                System.err.printf("Caracter invalido en linea %d, posicion %d: '%c'%n",
-                        lineNumber, (i + 1), character);
-                return null; // null indica error
+            // Validar caracteres permitidos
+            if (!isValidCharacter(character)) {
+                System.err.printf("Caracter potencialmente problematico en linea %d, posicion %d: '%c' (codigo: %d)%n",
+                        lineNumber, (i + 1), character, (int)character);
+                hasInvalidChars = true;
+                //Intentar procesar
             }
 
-            //Hacer el split
-            if (character == ',') {
-                //Encontramos un delimitador, guardar el campo actual
-                fields.add(currentField.toString());
-                currentField = new StringBuilder(); // Limpiar para el siguiente campo
+            // Manejo de comillas
+            if (character == '"') {
+                insideQuotes = !insideQuotes;
+                // No agregamos las comillas al campo
+                continue;
+            }
+
+            if (character == ',' && !insideQuotes) {
+                fields.add(currentField.toString().trim());
+                currentField = new StringBuilder();
             } else {
-                // Agregar el caracter al campo actual
                 currentField.append(character);
             }
         }
-        // agregar el campo actual a la lista de la linea que se esta seccionando
-        fields.add(currentField.toString());
-        // Convertir a String[] -> retornar como String[0] para que Java lo optimice
+
+        // Agregar el último campo
+        fields.add(currentField.toString().trim());
+
+        // Si habia caracteres muy problematicos, advertir pero continuar
+        if (hasInvalidChars) {
+            System.out.printf("ADVERTENCIA: Linea %d contiene caracteres especiales, procesando de todos modos%n", lineNumber);
+        }
         return fields.toArray(new String[0]);
+    }
+
+    // Validacion de caracteres flexible
+    private boolean isValidCharacter(char character) {
+        // Caracteres ASCII basicos
+        if (Character.isLetterOrDigit(character) ||
+                character == ',' || character == ' ' || character == '-' ||
+                character == '_' || character == '.' || character == ':' ||
+                character == '"' || character == '\'' || character == '(' ||
+                character == ')' || character == '&' || character == ';' ||
+                character == '/' || character == '\\' || character == '?' ||
+                character == '¿' || character == '!' || character == '@' ||
+                character == '#' || character == '%' || character == '*' ||
+                character == '+' || character == '=' || character == '[' ||
+                character == ']' || character == '{' || character == '}' ||
+                character == '|') {
+            return true;
+        }
+        // Caracteres con acentos y especiales latinos
+        if ((character >= 'À' && character <= 'ÿ') || character == 'ñ' || character == 'Ñ') {
+            return true;
+        }
+
+        // Algunos caracteres de control aceptables
+        if (character == '\t' || character == '\n' || character == '\r') {
+            return true;
+        }
+
+        return false;
     }
 
     //Procesa un registro individual del archivo
@@ -148,29 +210,59 @@ public class TxtReader {
             bookList.add(book);
             clientList.add(client);
             loanList.add(loan);
-
             return true;
-
         } catch (NumberFormatException e) {
             System.err.printf("Error al convertir ID de cliente a numero en linea %d: %s%n", lineNumber, rows[0].trim());
             return false;
         }
     }
 
-    //Auxiliar que el ID del cliente sea numérico y tenga longitud correcta
+    // Validacion para IDs de cliente
     private boolean isValidClientId(String clientId, int lineNumber) {
-        if (clientId.isEmpty() || clientId.length() > 4) {
-            System.err.printf("El ID del cliente no tiene la longitud correcta en linea %d: '%s' (maximo 4 digitos)%n", lineNumber, clientId);
+        // Manejar casos especiales
+        if (clientId.isEmpty() || clientId.equalsIgnoreCase("NULL") || clientId.equals("")) {
+            System.err.printf("ID de cliente vacio o nulo en linea %d: '%s'%n", lineNumber, clientId);
             return false;
         }
 
+        // Rechazar IDs claramente problematicos
+        if (clientId.equals("0")) {
+            System.err.printf("ID de cliente no puede ser 0 en linea %d%n", lineNumber);
+            return false;
+        }
+
+        if (clientId.startsWith("-")) {
+            System.err.printf("ID de cliente no puede ser negativo en linea %d: '%s'%n", lineNumber, clientId);
+            return false;
+        }
+
+        // Permitir IDs alfanumericos pero advertir
+        boolean hasLetters = false;
+        boolean hasNumbers = false;
+
         for (int i = 0; i < clientId.length(); i++) {
-            char digit = clientId.charAt(i);
-            if (!Character.isDigit(digit)) {
-                System.err.printf("Caracter invalido en el ID del cliente en linea %d, posicion %d: '%c'%n",
-                        lineNumber, (i + 1), digit);
+            char c = clientId.charAt(i);
+            if (Character.isLetter(c)) {
+                hasLetters = true;
+            } else if (Character.isDigit(c)) {
+                hasNumbers = true;
+            } else {
+                System.err.printf("Caracter invalido en ID de cliente en linea %d, posicion %d: '%c'%n",
+                        lineNumber, (i + 1), c);
                 return false;
             }
+        }
+
+        if (hasLetters) {
+            System.out.printf("ADVERTENCIA: ID de cliente alfanumerico en linea %d: '%s'%n", lineNumber, clientId);
+            return true;
+        }
+
+        // Validacion para IDs completamente numericos
+        if (clientId.length() > 4) {
+            System.err.printf("ID de cliente demasiado largo en linea %d: '%s' (maximo 4 digitos)%n",
+                    lineNumber, clientId);
+            return false;
         }
 
         try {
@@ -180,103 +272,89 @@ public class TxtReader {
                 return false;
             }
         } catch (NumberFormatException e) {
+            System.err.printf("ID de cliente no numerico en linea %d: '%s'%n", lineNumber, clientId);
             return false;
         }
 
         return true;
     }
 
-    //Auxiliar que el nombre del usuario solo contenga letras y espacios
+    // Validacion para nombres de usuario
     private boolean isValidUserName(String userName, int lineNumber) {
-        if (userName.isEmpty()) {
-            System.err.printf("Nombre de usuario vacio en linea %d%n", lineNumber);
+        if (userName.isEmpty() || userName.equalsIgnoreCase("NULL")) {
+            System.err.printf("Nombre de usuario vacio o nulo en linea %d%n", lineNumber);
             return false;
         }
 
+        // Permitir caracteres en nombres
         for (int i = 0; i < userName.length(); i++) {
             char character = userName.charAt(i);
-            if (!Character.isLetter(character) && character != ' ') {
-                System.err.printf("Nombre invalido en linea %d, posicion %d: '%c' (solo se permiten letras y espacios)%n",
+            if (!isValidNameCharacter(character)) {
+                System.err.printf("Caracter cuestionable en nombre en linea %d, posicion %d: '%c' - procesando de todos modos%n",
                         lineNumber, (i + 1), character);
-                return false;
             }
         }
         return true;
     }
 
-    //Auxiliar que verifica el ID del libro y tenga el formato correcto LIB###
+    // Caracteres validos en nombres
+    private boolean isValidNameCharacter(char c) {
+        return Character.isLetter(c) || c == ' ' || c == '\'' || c == '-' ||
+                c == '.' || c == '"' || c == '&' || (c >= 'À' && c <= 'ÿ') ||
+                c == 'ñ' || c == 'Ñ';
+    }
+
+    // Validacion para IDs de libro
     private boolean isValidBookId(String bookId, int lineNumber) {
+        if (bookId.isEmpty() || bookId.equalsIgnoreCase("NULL")) {
+            System.err.printf("ID de libro vacio o nulo en linea %d: '%s'%n", lineNumber, bookId);
+            return false;
+        }
+
+        // Permitir diferentes longitudes pero advertir si no es el formato esperado
+        if (bookId.length() < 3) {
+            System.err.printf("ID de libro demasiado corto en linea %d: '%s'%n", lineNumber, bookId);
+            return false;
+        }
+
         if (bookId.length() != 6) {
-            System.err.printf("Longitud del ID del libro invalida en linea %d: '%s' (debe ser de 6 caracteres)%n",
+            System.out.printf("ADVERTENCIA: ID de libro con formato no estandar en linea %d: '%s' (se esperaba 6 caracteres)%n",
                     lineNumber, bookId);
-            return false;
         }
 
-        // Validar codigo 'LIB'
-        String code = bookId.substring(0, 3);
-        if (!isValidLibCode(code, lineNumber)) {
-            return false;
-        }
-
-        // Validar numero del libro
-        String number = bookId.substring(3, 6);
-        return isValidLibNumber(number, lineNumber);
-    }
-
-    //Auxiliar que verifica el codigo  y este sea exactamente 'LIB' sin números
-    private boolean isValidLibCode(String code, int lineNumber) {
-        // Verificar que no tenga números
-        for (int i = 0; i < code.length(); i++) {
-            char character = code.charAt(i);
-            if (Character.isDigit(character)) {
-                System.err.printf("El codigo de libro contiene un numero en linea %d, posicion %d: '%c'%n",
-                        lineNumber, (i + 1), character);
-                return false;
+        // Si tiene al menos 3 caracteres, verificar si empieza con LIB
+        if (bookId.length() >= 3) {
+            String prefix = bookId.substring(0, 3).toUpperCase();
+            if (!prefix.equals("LIB")) {
+                System.out.printf("ADVERTENCIA: ID de libro no empieza con 'LIB' en linea %d: '%s'%n",
+                        lineNumber, bookId);
             }
         }
-
-        // Verificar que sea exactamente 'LIB'
-        if (!code.equals("LIB")) {
-            System.err.printf("El codigo del libro es incorrecto en linea %d: '%s' (debe ser 'LIB')%n",
-                    lineNumber, code);
-            return false;
-        }
-
         return true;
     }
 
-    //Auxiliar que verifica que el numero del libro sean exactamente 3 dígitos
-    private boolean isValidLibNumber(String number, int lineNumber) {
-        if (number.length() != 3) {
-            System.err.printf("El numero del libro es incorrecto en linea %d: '%s' (debe tener 3 digitos)%n",
-                    lineNumber, number);
-            return false;
-        }
-
-        for (int i = 0; i < number.length(); i++) {
-            char digit = number.charAt(i);
-            if (!Character.isDigit(digit)) {
-                System.err.printf("El numero del libro contiene caracter no numerico en linea %d, posicion %d: '%c'%n",
-                        lineNumber, (i + 1), digit);
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    //Auxiliar para ver que el título del libro no este vacio
+    // Validacion para titulos
     private boolean isValidBookTitle(String title, int lineNumber) {
-        if (title.isEmpty()) {
-            System.err.printf("Titulo de libro vacio en linea %d%n", lineNumber);
+        if (title.isEmpty() || title.equalsIgnoreCase("NULL")) {
+            System.err.printf("Titulo de libro vacio o nulo en linea %d%n", lineNumber);
             return false;
         }
+        // Los titulos pueden contener cualquier caracter
         return true;
     }
 
-    //Method que parsea una fecha con manejo de errores
+    // Parser de fechas
     private LocalDate parseDate(String dateString, int lineNumber, String fieldName) {
         if (dateString.isEmpty()) {
+            return null;
+        }
+
+        // Manejar casos especiales
+        if (dateString.equalsIgnoreCase("NULL") ||
+                dateString.equalsIgnoreCase("invalid_date") ||
+                dateString.contains("invalid")) {
+            System.err.printf("Fecha invalida en %s, linea %d: '%s'%n",
+                    fieldName, lineNumber, dateString);
             return null;
         }
 
@@ -292,8 +370,10 @@ public class TxtReader {
     //Imprime el resumen del procesamiento del archivo
     private void printSuccessfully(int totalLines, int successfulRecords, int totalLoans) {
         System.out.println("------------------------");
-        System.out.printf("Archivo TXT leido exitosamente. Procesadas %d lineas%n", totalLines);
+        System.out.printf("Archivo TXT procesado completamente%n");
+        System.out.printf("Lineas procesadas: %d%n", totalLines);
         System.out.printf("Registros exitosos: %d%n", successfulRecords);
+        System.out.printf("Registros fallidos: %d%n", (totalLines - successfulRecords));
         System.out.printf("Prestamos cargados: %d%n", totalLoans);
         System.out.println("------------------------");
     }
