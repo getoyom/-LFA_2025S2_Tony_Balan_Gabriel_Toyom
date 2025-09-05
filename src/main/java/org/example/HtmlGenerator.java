@@ -10,128 +10,130 @@ public class HtmlGenerator {
     public HtmlGenerator() {}
 
     // Genera un archivo HTML completo con todos los reportes de la biblioteca
-    public void GenerateHTML(BookHashTable libros, ClientHashTable usuarios, ArrayList<Loan> prestamos,
-                             Client masFrecuente, Book libroPrestado, ArrayList<Loan> vencidos) {
+    public void GenerateHTML(BookHashTable books, ClientHashTable users, ArrayList<Loan> loans,
+                             Client mostFrequent, Book mostLoanedBook, ArrayList<Loan> overdue) {
         try (BufferedWriter escritor = new BufferedWriter(new FileWriter(OUTPUT_FILE))) {
             writeHtmlHeader(escritor);
-            writeLoansHistory(escritor, prestamos);
-            writeUniqueUsers(escritor, usuarios);
-            writeLoanedBooks(escritor, libros);
-            writeLoanStatistics(escritor, prestamos, masFrecuente, libroPrestado, usuarios);
-            writeOverdueLoans(escritor, vencidos);
+            writeLoansHistory(escritor, loans);
+            writeUniqueUsers(escritor, users);
+            writeLoanedBooks(escritor, books);
+            writeLoanStatistics(escritor, loans, mostFrequent, mostLoanedBook, users);
+            writeOverdueLoans(escritor, overdue);
             writeHtmlFooter(escritor);
             System.out.println("El archivo HTML generado correctamente...\n");
         } catch (IOException e) {
-            System.err.println("Error al generar el archivo HTML: " + e.getMessage());
+            System.err.printf("Error al generar el archivo HTML: %s ", e.getMessage());
         }
     }
 
     // Escribe la cabecera HTML con estilos CSS
-    private void writeHtmlHeader(BufferedWriter escritor) throws IOException {
-        escritor.write("<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n<meta charset=\"UTF-8\">\n");
-        escritor.write("<title>Reportes de Biblioteca Digital</title>\n");
-        escritor.write(getCssStyles());
-        escritor.write("</head>\n<body>\n");
-        escritor.write("<h1>Reportes de biblioteca digital</h1>\n");
+    private void writeHtmlHeader(BufferedWriter writer) throws IOException {
+        writer.write("<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n<meta charset=\"UTF-8\">\n");
+        writer.write("<title>Reportes de Biblioteca Digital</title>\n");
+        writer.write(getCssStyles());
+        writer.write("</head>\n<body>\n");
+        writer.write("<h1>Reportes de biblioteca digital</h1>\n");
     }
 
     // Retorna los estilos CSS para el documento HTML
     private String getCssStyles() {
-        return "<style>\n" +
-                "body { font-family: Arial; margin: 20px; }\n" +
-                "table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }\n" +
-                "th, td { border: 1px solid #999; padding: 8px; text-align: center; }\n" +
-                "th { background-color: #f2f2f2; }\n" +
-                "</style>\n";
+        return """
+                <style>
+                body { font-family: Arial; margin: 20px; }
+                table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+                th, td { border: 1px solid #999; padding: 8px; text-align: center; }
+                th { background-color: #f2f2f2; }
+                </style>
+                """;
     }
 
     // Escribe la seccion de historial de prestamos
-    private void writeLoansHistory(BufferedWriter escritor, ArrayList<Loan> prestamos) throws IOException {
-        escritor.write("<h2>Historial de Prestamos</h2>\n");
-        escritor.write("<table>\n");
-        escritor.write("<tr><th>ID Usuario</th><th>Nombre</th><th>ID Libro</th><th>Titulo</th><th>Fecha Prestamo</th><th>Fecha Devolucion</th></tr>\n");
+    private void writeLoansHistory(BufferedWriter writer, ArrayList<Loan> loans) throws IOException {
+        writer.write("<h2>Historial de Prestamos</h2>\n");
+        writer.write("<table>\n");
+        writer.write("<tr><th>ID Usuario</th><th>Nombre</th><th>ID Libro</th><th>Titulo</th><th>Fecha Prestamo</th><th>Fecha Devolucion</th></tr>\n");
 
-        for (Loan prestamo : prestamos) {
+        for (Loan loan : loans) {
             String row = String.format("<tr><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n",
-                    prestamo.getClient().getId(),
-                    prestamo.getClient().getName(),
-                    prestamo.getBook().getId(),
-                    prestamo.getBook().getTitle(),
-                    prestamo.getDateLoan(),
-                    prestamo.getDateDue() != null ? prestamo.getDateDue() : "No devuelto");
-            escritor.write(row);
+                    loan.getClient().getId(),
+                    loan.getClient().getName(),
+                    loan.getBook().getId(),
+                    loan.getBook().getTitle(),
+                    loan.getDateLoan(),
+                    loan.getDateDue() != null ? loan.getDateDue() : "No devuelto");
+            writer.write(row);
         }
-        escritor.write("</table>\n");
+        writer.write("</table>\n");
     }
 
 
      //Escribe la seccion de usuarios unicos
-    private void writeUniqueUsers(BufferedWriter escritor, ClientHashTable usuarios) throws IOException {
-        escritor.write("<h2>Listado de Usuarios Unicos</h2>\n");
-        escritor.write("<table>\n");
-        escritor.write("<tr><th>ID Usuario</th><th>Nombre</th></tr>\n");
+    private void writeUniqueUsers(BufferedWriter writer, ClientHashTable users) throws IOException {
+        writer.write("<h2>Listado de Usuarios Unicos</h2>\n");
+        writer.write("<table>\n");
+        writer.write("<tr><th>ID Usuario</th><th>Nombre</th></tr>\n");
 
-        ArrayList<Client> listaUsuarios = usuarios.toClientList();
-        for (Client usuario : listaUsuarios) {
+        ArrayList<Client> usersList = users.toClientList();
+        for (Client client : usersList) {
             String row = String.format("<tr><td>%d</td><td>%s</td></tr>\n",
-                    usuario.getId(), usuario.getName());
-            escritor.write(row);
+                    client.getId(), client.getName());
+            writer.write(row);
         }
-        escritor.write("</table>\n");
+        writer.write("</table>\n");
     }
 
     //Escribe la seccion de libros prestados
-    private void writeLoanedBooks(BufferedWriter escritor, BookHashTable libros) throws IOException {
-        escritor.write("<h2>Listado de libros Prestados</h2>\n");
-        escritor.write("<table>\n");
-        escritor.write("<tr><th>ID Libro</th><th>Titulo libro</th></tr>\n");
+    private void writeLoanedBooks(BufferedWriter writer, BookHashTable books) throws IOException {
+        writer.write("<h2>Listado de libros Prestados</h2>\n");
+        writer.write("<table>\n");
+        writer.write("<tr><th>ID Libro</th><th>Titulo libro</th></tr>\n");
 
-        ArrayList<Book> listaLibros = libros.toBookList();
-        for (Book libro : listaLibros) {
+        ArrayList<Book> bookList = books.toBookList();
+        for (Book book : bookList) {
             String row = String.format("<tr><td>%s</td><td>%s</td></tr>\n",
-                    libro.getId(), libro.getTitle());
-            escritor.write(row);
+                    book.getId(), book.getTitle());
+            writer.write(row);
         }
-        escritor.write("</table>\n");
+        writer.write("</table>\n");
     }
 
 
      //Escribe la seccion de estadisticas de prestamos
-    private void writeLoanStatistics(BufferedWriter escritor, ArrayList<Loan> prestamos, Client masFrecuente,
-                                     Book libroPrestado, ClientHashTable usuarios) throws IOException {
-        escritor.write("<h2>Estadisticas de Prestamos</h2>\n");
-        escritor.write("<table>\n");
-        escritor.write("<tr><th>Total Prestamos</th><th>Libro Mas Prestado</th><th>Usuario Mas Activo</th><th>Total Usuarios Unicos</th></tr>\n");
+    private void writeLoanStatistics(BufferedWriter writer, ArrayList<Loan> loans, Client mostFrequent,
+                                     Book mostLoanedBook, ClientHashTable users) throws IOException {
+        writer.write("<h2>Estadisticas de Prestamos</h2>\n");
+        writer.write("<table>\n");
+        writer.write("<tr><th>Total Prestamos</th><th>Libro Mas Prestado</th><th>Usuario Mas Activo</th><th>Total Usuarios Unicos</th></tr>\n");
 
         String row = String.format("<tr><td>%d</td><td>%s</td><td>%s</td><td>%d</td></tr>\n",
-                prestamos.size(),
-                libroPrestado != null ? libroPrestado.getTitle() : "N/A",
-                masFrecuente != null ? masFrecuente.getName() : "N/A",
-                usuarios.toClientList().size());
-        escritor.write(row);
-        escritor.write("</table>\n");
+                loans.size(),
+                mostLoanedBook != null ? mostLoanedBook.getTitle() : "N/A",
+                mostFrequent != null ? mostFrequent.getName() : "N/A",
+                users.toClientList().size());
+        writer.write(row);
+        writer.write("</table>\n");
     }
 
     //Escribe la seccion de prestamos vencidos
-    private void writeOverdueLoans(BufferedWriter escritor, ArrayList<Loan> vencidos) throws IOException {
-        escritor.write("<h2>Prestamos Vencidos</h2>\n");
-        escritor.write("<table>\n");
-        escritor.write("<tr><th>ID Usuario</th><th>Nombre</th><th>ID Libro</th><th>Titulo</th><th>Fecha Prestamo</th></tr>\n");
+    private void writeOverdueLoans(BufferedWriter writer, ArrayList<Loan> overdue) throws IOException {
+        writer.write("<h2>Prestamos Vencidos</h2>\n");
+        writer.write("<table>\n");
+        writer.write("<tr><th>ID Usuario</th><th>Nombre</th><th>ID Libro</th><th>Titulo</th><th>Fecha Prestamo</th></tr>\n");
 
-        for (Loan prestamo : vencidos) {
+        for (Loan loan : overdue) {
             String row = String.format("<tr><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n",
-                    prestamo.getClient().getId(),
-                    prestamo.getClient().getName(),
-                    prestamo.getBook().getId(),
-                    prestamo.getBook().getTitle(),
-                    prestamo.getDateLoan());
-            escritor.write(row);
+                    loan.getClient().getId(),
+                    loan.getClient().getName(),
+                    loan.getBook().getId(),
+                    loan.getBook().getTitle(),
+                    loan.getDateLoan());
+            writer.write(row);
         }
-        escritor.write("</table>\n");
+        writer.write("</table>\n");
     }
 
     //Escribe el pie del documento HTML
-    private void writeHtmlFooter(BufferedWriter escritor) throws IOException {
-        escritor.write("</body>\n</html>");
+    private void writeHtmlFooter(BufferedWriter writer) throws IOException {
+        writer.write("</body>\n</html>");
     }
 }
